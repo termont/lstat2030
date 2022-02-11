@@ -1,0 +1,2 @@
+"0","knitr::opts_chunk$set(echo = TRUE)"
+"0","dataCar=read.csv(""data/dataCar.csv"",sep="","",header=TRUE,dec=""."")"
