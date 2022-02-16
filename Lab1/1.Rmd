@@ -8,19 +8,49 @@ knitr::opts_chunk$set(echo = FALSE,comment=NA)
 dataCar=read.csv("data/dataCar.csv",sep=",",header=TRUE,dec=".")
 ```
 
-**1.** The dimension of the data (num. of rows, num. of columns) is (_**`r nrow(dataCar)`**_,_**`r ncol(dataCar)`**_).
+**1.** The dimension of the data (num. of rows, num. of columns) is (_**`r nrow(dataCar)`**_, _**`r ncol(dataCar)`**_).
 
 **2.** The first six lines of this data are
 ```{r p2}
 head(dataCar) |> knitr::kable()
 ```
-**3.** Using the R sunction str(), we get the structure of the data
+**3.** Using the R function `str()`, we get the structure of the data
 ```{r p3}
 str(dataCar)
 ```
-
-**4.** We made use of the function `subset()` to delete the first column of `dataCar` and the function `transform()` to transform the variables `r colnames(dataCar)[4:ncol(dataCar)]` to a factor. The summary of the resulting data is
+**4.** We made use of the function `subset()` to delete the first column of `dataCar` and the function `transform()` to transform the variables ` clm`, `numclaims`, `veh_body`, `veh_age`, `gender`, `area`, and `agecat` to a factor. The summary of the resulting data is
 ```{r}
-summary(subset(dataCar,select=-c(X)))
+dataCar <-transform(subset(dataCar,select=-c(X)),clm=as.factor(clm),numclaims=as.factor(numclaims),veh_body=as.factor(veh_body),veh_age=as.factor(veh_age),gender=as.factor(gender),area=as.factor(area),agecat=as.factor(agecat)) 
+summary(dataCar,digits=1)
+```
+**5.** Below is a Barplot of numclaims.
+
+```{r}
+minClaims=0
+maxClaims=4
+data <- data.frame(name=seq(minClaims,maxClaims),value=0.0)
+n <- nrow(dataCar)
+for(i in 0:4) {
+  data[i+1,2]=nrow(subset(dataCar,numclaims==i))/n
+}
+barplot(height=data$value,names=data$name)
+```
+**6.** We define `dataCar0` to be the subset data with _only variables_ `claimcst0` and `veh_value` and _only subjects_ with (`claimcst0` >0) and (`agecat` = 3 or 4). In the flowing we will work with this data. Its summary appears below.
+```{r}
+dataCar0 = subset(dataCar,claimcst0>0&(agecat==3 | agecat==4))[c('claimcst0','veh_value')]
+summary(dataCar0,digits=3)
+```
+**7.** We fit a linear regression model with veh_value as independent variable and claimcst0 as dependent variable. We also fit another linear model but this time with log(claimcst0) as independent variable. The summary of each model is given below.
+
+* `claimcst0` $\sim$ `veh_value`
+```{r}
+res <- lm(claimcst0 ~ veh_value,data=dataCar0)
+res$Coefficients
+```
+
+* `log(claimcst0)` $\sim$ `veh_value`
+```{r}
+res_log <- lm(log(claimcst0) ~ veh_value,data=dataCar0)
+res_log
 ```
 
