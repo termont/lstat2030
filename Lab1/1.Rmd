@@ -1,6 +1,9 @@
 ---
 title: "Exercice 1"
-output: pdf_document
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -25,16 +28,15 @@ summary(dataCar,digits=1)
 ```
 **5.** Below is a Barplot of numclaims.
 
-```{r}
-minClaims=0
-maxClaims=4
-data <- data.frame(name=seq(minClaims,maxClaims),value=0.0)
+```{r,fig.cap="Barplot of `numclaims`",out.width="90%"}
+data <- data.frame(name=seq(0,4),value=0.0)
 n <- nrow(dataCar)
 for(i in 0:4) {
   data[i+1,2]=nrow(subset(dataCar,numclaims==i))/n
 }
-barplot(height=data$value,names=data$name)
+barplot(height=data$value,names=data$name,xlab="numclaims",ylab="%")
 ```
+
 **6.** We define `dataCar0` to be the subset data with _only variables_ `claimcst0` and `veh_value` and _only subjects_ with (`claimcst0` >0) and (`agecat` = 3 or 4). In the flowing we will work with this data. Its summary appears below.
 ```{r}
 dataCar0 = subset(dataCar,claimcst0>0&(agecat==3 | agecat==4))[c('claimcst0','veh_value')]
@@ -45,12 +47,38 @@ summary(dataCar0,digits=3)
 * `claimcst0` $\sim$ `veh_value`
 ```{r}
 res <- lm(claimcst0 ~ veh_value,data=dataCar0)
-res$Coefficients
+summary(res)$coef
 ```
 
 * `log(claimcst0)` $\sim$ `veh_value`
 ```{r}
 res_log <- lm(log(claimcst0) ~ veh_value,data=dataCar0)
-res_log
+summary(res_log)$coefficients
+```
+**8.** We compute, for each model, a 95% confidence intervals (confint) for the intercept and the slope parameters.
+We then use the `kableExtra` functions `kbl()`, `kable_styling()`, `pack_rows()` and `add_header_above()`,
+to construct the following table.
+```{r}
+m_lin <- cbind(round(summary(res)$coef,3),round(confint(res),3))
+m_log <- cbind(round(summary(res_log)$coef,3),round(confint(res_log),3))
+m_combined<- rbind(m_lin,m_log) 
+m_combined |> 
+  kableExtra::kbl() |> 
+#  kableExtra::kable_styling() |>
+  kableExtra::kable_classic() |>
+  kableExtra::add_header_above(c(" "=5,"confint"=2)) |>
+  kableExtra::pack_rows("claimcst0 ~ veh_value",1,2) |>
+  kableExtra::pack_rows("log(claimcst0) ~ veh_value",3,4)
 ```
 
+**9.** Figure 2 below show the scatterplots `claimcst0~veh_value` and `log(claimcst0)~veh_value` (side by
+side) with the corresponding least squares regression lines.
+
+```{r, out.width="50%",fig.show="hold",fig.asp=0.9,fig.cap="Least Squares Regression Lines; (a) Y = claimcst0 and (b) Y = log(claimcst0)"}
+plot(claimcst0~veh_value,data=dataCar0)
+abline(res,col="blue")
+plot(log(claimcst0)~veh_value,data=dataCar0)
+abline(res_log,col="blue")
+```
+
+To lean more about linear regression, visit the website of [Introduction to Modern Statistics.](https://openintro-ims.netlify.app/model-slr.html#model-slr)
