@@ -1,0 +1,111 @@
+---
+title: "A Simulation Study"
+author: "Didier Termont"
+output: 
+  html_document:
+    theme: readable
+    highlight: tango
+    toc: true
+    toc_float: true
+    df_print: paged
+---
+
+```{r setup , include=FALSE }
+knitr::opts_chunk$set(echo = TRUE, comment=NA )
+klippy::klippy(lang=c("r","markdown"),position=c("top","right"))
+```
+# 1 Data {.tabset .tabset-pills}
+
+## Normal distribution
+
+We first recall the definition of a normal random variable (displayed through a quote environment).
+
+> A random variable $X$ is said to be normally distributed with mean $\mu$ and variance $\sigma^2$ if it has a probability density function $f:R→R^+$ given by
+> $f(x) = \frac{1}{\sqrt(2\pi)\sigma}exp\{-\frac{(x-\mu)^2}{2\sigma^2}\}$ (1.1)
+
+This is written as $X \sim N(\mu,\sigma^2)$.
+
+More details about normal random variables (r.v.) can be found on [this page](https://en.wikipedia.org/wiki/Normal_distribution).
+
+## Simulations
+
+The R function `rnorm` allows us to draw simulations from the normal density function as given by Equation (1.1).
+
+Let fix some parameters and generate some data.
+
+```{r simu, class.source='klippy'}
+set.seed(1)
+n <- 100
+mu <- 100
+stdev <- 2
+v <- stdev^2
+b0 <- 2
+b1 <- 1
+X <- rnorm(n, mu, stdev)
+Y <- b0 + b1 * X + rnorm(n)
+samp <- data.frame(X = X, Y = Y)
+samp
+```
+
+As you can see, we draw **100** realizations from two random variables : $X \sim N(100, 4)$ and $Y=b_0+b_1×X+\epsilon$, with $b_0= 2$, $b_1= 1$, and $\epsilon \sim  N(0,1)$.
+
+Observe that if you re- render the Rmd (source) file with different parameters `(n, mu, stdev, b0, b1)`, then all the numbers above get updated automatically. Check it!
+
+The simulated data will be use to fit a linear model, See the section [Linear model](https://elghouch.github.io/LSTAT2030/Labs/Lab1/2E.html#ll).
+
+# 2 Descriptive statistics {.tabset .tabset-pills}
+
+## Summary statistics
+
+* The empirical mean and variance of $X$ are **100** and **3**, respectively.
+* The empirical mean and variance of $Y$ are **102** and **4**, respectively.
+
+Let’s summarize the simulations with the help of the summary function.
+
+```{r, echo=FALSE, comment=NA}
+summary(samp,digits=3)
+```
+
+## Histogram of X
+
+We can use the `hist` function to display, for example, the histogram of $X$:
+
+```{r}
+hist(samp$X)
+```
+
+## Histogram of Y
+
+Similarly here is a histogram of $Y$:
+```{r}
+hist(samp$Y)
+```
+
+# 3 Linear model {.tabset .tabset-pills}
+
+## The model
+
+We built a linear regression model using
+```{r}
+fit <- lm(Y~X,data=samp)
+```
+
+We get the following output
+```{r}
+summary(fit)$coef
+```
+
+The coefficient of determination ($R^2$) of the model is **0.778**
+
+## Scatter plot with regression line
+
+```{r}
+plot(Y~X,data=samp)
+abline(fit)
+```
+
+## Residuals and fitted values
+
+The model fitted values (fitted) and residuals (fit$residuals) are
+
+## Diagnostic plot
