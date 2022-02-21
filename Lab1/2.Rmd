@@ -12,7 +12,8 @@ output:
 
 ```{r setup , include=FALSE }
 knitr::opts_chunk$set(echo = TRUE, comment=NA )
-klippy::klippy(lang=c("r","markdown"),position=c("top","right"))
+options(scipen = 1,digits=3)
+#klippy::klippy(lang=c("r","markdown"),position=c("top","right"))
 ```
 # 1 Data {.tabset .tabset-pills}
 
@@ -20,8 +21,9 @@ klippy::klippy(lang=c("r","markdown"),position=c("top","right"))
 
 We first recall the definition of a normal random variable (displayed through a quote environment).
 
-> A random variable $X$ is said to be normally distributed with mean $\mu$ and variance $\sigma^2$ if it has a probability density function $f:R→R^+$ given by
-> $f(x) = \frac{1}{\sqrt(2\pi)\sigma}exp\{-\frac{(x-\mu)^2}{2\sigma^2}\}$ (1.1)
+> A random variable $X$ is said to be normally distributed with mean $\mu$ and variance $\sigma^2$ if it has a probability density function $f:\mathbb{R} \rightarrow \mathbb{R}^+$ given by
+>
+> $$f(x) = \frac{1}{\sqrt(2\pi)\sigma}exp\{-\frac{(x-\mu)^2}{2\sigma^2}\}$$ (1.1) 
 
 This is written as $X \sim N(\mu,\sigma^2)$.
 
@@ -51,39 +53,39 @@ As you can see, we draw **100** realizations from two random variables : $X \sim
 
 Observe that if you re- render the Rmd (source) file with different parameters `(n, mu, stdev, b0, b1)`, then all the numbers above get updated automatically. Check it!
 
-The simulated data will be use to fit a linear model, See the section [Linear model](https://elghouch.github.io/LSTAT2030/Labs/Lab1/2E.html#ll).
+The simulated data will be use to fit a linear model, See the section [Linear model](#lin-model).
 
 # 2 Descriptive statistics {.tabset .tabset-pills}
 
 ## Summary statistics
 
-* The empirical mean and variance of $X$ are **100** and **3**, respectively.
-* The empirical mean and variance of $Y$ are **102** and **4**, respectively.
+* The empirical mean and variance of $X$ are **`r round(mean(X),0)`** and **`r round(var(X),0)`**, respectively.
+* The empirical mean and variance of $Y$ are **`r round(mean(Y),0)`** and **`r round(var(Y),0)`**, respectively.
 
-Let’s summarize the simulations with the help of the summary function.
+Let’s summarize the simulations with the help of the `summary` function.
 
 ```{r, echo=FALSE, comment=NA}
-summary(samp,digits=3)
+summary(samp,digits=3) |> kableExtra::kbl() |> kableExtra::kable_styling()
 ```
 
 ## Histogram of X
 
 We can use the `hist` function to display, for example, the histogram of $X$:
 
-```{r}
-hist(samp$X)
+```{r, echo=FALSE}
+hist(samp$X,xlab=NA,main="Histogram of X, a Normal R.V. with mean 100 and variance 4")
 ```
 
 ## Histogram of Y
 
 Similarly here is a histogram of $Y$:
-```{r}
-hist(samp$Y)
+```{r, echo=FALSE}
+hist(samp$Y,xlab=NA,main="Histogram of Y")
 ```
 
 # 3 Linear model {.tabset .tabset-pills}
 
-## The model
+## The model {#lin-model}
 
 We built a linear regression model using
 ```{r}
@@ -91,21 +93,30 @@ fit <- lm(Y~X,data=samp)
 ```
 
 We get the following output
-```{r}
-summary(fit)$coef
+```{r, echo=FALSE}
+summary(fit)$coef |> kableExtra::kbl() |> kableExtra::kable_styling()
 ```
 
 The coefficient of determination ($R^2$) of the model is **0.778**
 
 ## Scatter plot with regression line
 
-```{r}
+```{r, echo=FALSE,fig.cap="Figure 3.1: Fitted linear model",fig.align='center'}
 plot(Y~X,data=samp)
 abline(fit)
 ```
 
 ## Residuals and fitted values
 
-The model fitted values (fitted) and residuals (fit$residuals) are
+The model fitted values (`fitted`) and residuals (`fit$residuals`) are
+```{r, echo=FALSE}
+f <- data.frame(fitted=fitted(fit),residuals=fit$residuals)
+f
+```
+
 
 ## Diagnostic plot
+```{r, echo=FALSE, fig.cap="Figure 3.2: Residuals vs fitted values",fig.align='center'}
+plot(residuals~fitted,data=f)
+```
+
