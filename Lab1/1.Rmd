@@ -2,8 +2,6 @@
 title: "Exercice 1"
 output:
   pdf_document: default
-  html_document:
-    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -58,20 +56,20 @@ summary(res_log)$coefficients
 **8.** We compute, for each model, a 95% confidence intervals (confint) for the intercept and the slope parameters.
 We then use the `kableExtra` functions `kbl()`, `kable_styling()`, `pack_rows()` and `add_header_above()`,
 to construct the following table.
-```{r}
+```{r, results='hold'}
 m_lin <- cbind(round(summary(res)$coef,3),round(confint(res),3))
 m_log <- cbind(round(summary(res_log)$coef,3),round(confint(res_log),3))
 m_combined<- rbind(m_lin,m_log) 
 m_combined |> 
-  kableExtra::kbl() |> 
-#  kableExtra::kable_styling() |>
+  kableExtra::kbl(booktabs = T) |> 
+  kableExtra::kable_styling(latex_options = c("hold_position")) |>
   kableExtra::kable_classic() |>
   kableExtra::add_header_above(c(" "=5,"confint"=2)) |>
   kableExtra::pack_rows("claimcst0 ~ veh_value",1,2) |>
   kableExtra::pack_rows("log(claimcst0) ~ veh_value",3,4)
 ```
 
-**9.** Figure 2 below show the scatterplots `claimcst0~veh_value` and `log(claimcst0)~veh_value` (side by
+**9.** Figure [2](#figure-2) below show the scatterplots `claimcst0~veh_value` and `log(claimcst0)~veh_value` (side by
 side) with the corresponding least squares regression lines.
 
 ```{r, out.width="50%",fig.show="hold",fig.asp=0.9,fig.cap="Least Squares Regression Lines; (a) Y = claimcst0 and (b) Y = log(claimcst0)"}
@@ -80,5 +78,5 @@ abline(res,col="blue")
 plot(log(claimcst0)~veh_value,data=dataCar0)
 abline(res_log,col="blue")
 ```
-
+### {#figure-2}
 To lean more about linear regression, visit the website of [Introduction to Modern Statistics.](https://openintro-ims.netlify.app/model-slr.html#model-slr)
