@@ -1,0 +1,61 @@
+---
+title: "An RMarkdown report"
+author: "Termont Didier"
+output: 
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+options(scipen=1,digits=3)
+```
+
+# Data description
+
+In this project we consider the classical iris data set that can be found in the base R package datasets. iris has **`r ncol(iris)`** columns named **`r colnames(iris)`** and **`r nrow(iris)`**
+observations.
+
+To get help about columns, run `?iris`.
+
+The data set `iris` is
+```{r}
+iris
+```
+
+# Descriptive analysis
+First, we compute some descriptive statistics with the `summary()` function:
+
+```{r}
+summary(iris) |> kableExtra::kbl(caption = "Descriptive statistics") |> kableExtra::kable_styling()
+```
+Second, we use the function `aggregate` to get the following table that shows the means of the 4 numerical variables for each species.
+```{r}
+aggregate(. ~ Species, data = iris, mean) |> kableExtra::kbl(caption="Mean by species") |> kableExtra::kable_styling()
+```
+
+# Linear regression
+We use the function `cor()` to get the Pearson’s coefficients of correlation between all our numeric variables:
+```{r}
+cor(iris[1:4]) |> kableExtra::kbl(caption="Pearson's coefficients of correlation") |> kableExtra::kable_styling()
+```
+Here are 3 scatter plots that show the association between `Petal.Length` and the other numerical variables.
+```{r,fig.asp=0.9,out.width="50%"}
+plot(Sepal.Length~Petal.Length,data=iris)
+plot(Sepal.Width~Petal.Length,data=iris)
+plot(Petal.Width~Petal.Length,data=iris)
+```
+
+Now, we would like to explain the variations in the length of the sepal as a function of the length of the petal. To do so, we use the following linear regression `lm(Sepal.Length ~ Petal.Length, data = iris)`. Here is the summary of this model:
+```{r}
+model <- lm(Sepal.Length~Petal.Length,data=iris)
+summary(model)$coef |> kableExtra::kbl(caption = "Summary of lm: Sepal.Length ~ Petal.Length") |> kableExtra::kable_styling()
+```
+The model equation is $$\widehat{Sepal.length} = a + b Petal.Length$$
+Here are the data with the regression line:
+```{r}
+plot(Sepal.Length~Petal.Length,data=iris,xlab="Petal length",ylab="Sepal length")
+abline(model)
+```
+
+Finally, we use the ´plot(reg)´ command to get some graphical representations of the residuals.
