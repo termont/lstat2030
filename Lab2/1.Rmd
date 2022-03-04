@@ -1,0 +1,39 @@
+---
+title: '1'
+author: "Termont Didier"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.align="center")
+
+library(ggplot2)
+
+set.seed(10)
+diamonds2 <- diamonds[sample(nrow(diamonds),size=400),]
+```
+
+# Exercice 1
+
+## 1 
+```{r}
+theme_set(theme_bw())
+p1 <- ggplot(data=diamonds2,aes(x=carat,y=price,size=2)) +
+  geom_point()
+
+p1
+```
+
+## 2
+```{r}
+p1 + geom_point(color="blue")
+```
+
+## 3
+```{r}
+p1 + aes(color=cut) + 
+  geom_rug(mapping=aes(color="black")) + 
+  labs(col="Cut quality")
+```
+
